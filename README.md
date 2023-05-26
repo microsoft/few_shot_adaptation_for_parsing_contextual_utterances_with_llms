@@ -1,14 +1,66 @@
-# Project
+## Introduction
+This repository contains code for the paper Few-Shot Adaptation for Parsing Contextual Utterances with LLMs.
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+## Data
+The data is under the directory: `release_data`. The non-contextual utterance files with `*-find_event.*.jsonl` are the data used to train and evaluate the model before finetuning with contextual utterances. For contextual utterances, the files that are used are `*-find_event_revise.*.proportional_split.jsonl` for all paradigms in the paper except for the Parse-Then-Resolve paradigm which use `*-find_event_revise.*.proportional_split.edit_fragment_plan.resplit.jsonl`. Each line in the train/validation files contains one example.
 
-As the maintainer of this project, please make a few updates:
+## Environment Setup
+All experiments are run with a modified version of the codebase from the BenchCLAMP codebase under `semantic_parsing_with_constrained_lm/`. To set up the environement, follow the instructions under `semantic_parsing_with_constrained_lm/README.md`.
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+## Grammar Files
+To generate the grammar files, first convert the files into the original SMCalFlow format by running `scripts/convert_to_smcalflow_format.py`. An example of the arguments to apss int are in `scripts/convert_to_smcalflow_format.sh`.
+
+With the original SMCalFlow formatted files, we can now generate the grammar files for the contextual utterances. To generate `python src/semantic_parsing_with_constrained_lm/domains/lispress_v2/create_benchclamp_data.py` in the `semantic_parsing_with_constrained_lm` directory.
+
+## Fine-Tuning Experiments
+For the finetuning experiments, we first train the LLMs on the non-contextual utterances. The `exp-name-pattern`
+ argument controls the model, data, input format, and learning rate for a training run. As an example, to produc
+e the base model trained on the non-contextual utterances, run the following command:
+```
+python -m semantic_parsing_with_constrained_lm.finetune.lm_finetune \
+--config-name semantic_parsing_with_constrained_lm.configs.benchclamp_config \
+--exp-name-pattern 't5-base-lm-adapt_calflowfindevent_no_context_all_0.0001'
+
+```
+
+Then, to evaluate the model run, `model-loc` passing in the model from the previous step.
+```
+python -m semantic_parsing_with_constrained_lm.run_exp \
+        --config-name semantic_parsing_with_constrained_lm.configs.benchclamp_config \
+        --exp-names 't5-base-lm-adapt_calflowfindevent_no_context_all_0.0001_10000_dev_eval' \
+        --model-loc '/trained_models/1.0/t5-base-lm-adapt_calflowfindevent_no_context_all_0.0001/checkpoint-1000
+0'
+```
+
+To finetune the model on the contextual utterances, change the `exp-name-pattern` to vary what data to train on,
+ and what context is presented to the model. For example, to finetune the model with the `Parse-With-Reference-P
+rogram` paradigm on the contextual utterances, run the following command:
+```
+python -m semantic_parsing_with_constrained_lm.finetune.lm_finetune \
+--config-name semantic_parsing_with_constrained_lm.configs.benchclamp_config \
+--exp-name-pattern 't5-base-lm-findevent_calflowfindeventrevise_last_plan_low_0_0.0001'
+```
+The reproduce all other paradigms in the fine-tuning section of Table 1, change the `last_plan` to `last_utteran
+ce` for the `Parse-With-Last-Utterance-History`, and `rewritten_utterance` for the `Rewrite-Then-Parse` approarc
+h. For the `Parse-Then-Resolve` paradigm, change the data from `calflowfindeventreviseeditfragment`. Evaluation
+is done in the same way as the non-contextual utterances.
+
+## In-context Learning Experiments
+To run the in-context learning experiments in Table 1, first set the environemtal variables by `OPENAI_GPT3_ENGI
+NE` to the model name in the OpenAI API. Our experiments use `text-davinci-003`. Also set `SM_OPENAI_API_KEY` to
+ the OpenAI API key. Note: SM_OPENAI_KEY is an internal engine. Then, run the `semantic_parsing_with_constrained
+_lm.run_exp` with the the GPT3 config. For example, to run the `Parse-With-Reference-Program` paradigm, run the
+following command:
+```
+python -m semantic_parsing_with_constrained_lm.run_exp \
+    --config-name semantic_parsing_with_constrained_lm.configs.benchclamp_gpt3_config \
+    --exp-name-pattern 'text-davinci-003_calflowfindeventrevise_last_plan_low_0_2_dev_eval_constrained_bs_5'
+```
+## Binary Classifier
+To get the results for Table 2, we additionally need to train a binary classifer for deciding when to run the co
+ntextual parsing model vs non-contextual parsing model. To train finetune the model used in the paper,  run `scr
+ipts/finetune_revision_classifier.py` finetunes`roberta-base` on examples a balanced set of examples from the `r
+elease_data` contextual and non-contextual utterance.
 
 ## Contributing
 
