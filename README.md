@@ -2,7 +2,7 @@
 This repository contains code for the paper Few-Shot Adaptation for Parsing Contextual Utterances with LLMs.
 
 ## Data
-The data is under the directory: `release_data`. The non-contextual utterance files with `*-find_event.*.jsonl` are the data used to train and evaluate the model before finetuning with contextual utterances. For contextual utterances, the files that are used are `*-find_event_revise.*.proportional_split.jsonl` for all paradigms in the paper except for the Parse-Then-Resolve paradigm which use `*-find_event_revise.*.proportional_split.edit_fragment_plan.resplit.jsonl`. Each line in the train/validation files contains one example.
+The data is under the directory: `release_data`. The non-contextual utterance files with `*-find_event.*.jsonl` are the data used to train and evaluate the model before finetuning with contextual utterances. For contextual utterances, the files that are used are `*-find_event_revise.*.proportional_split.jsonl` for all paradigms in the paper except for the Parse-Then-Resolve paradigm which use `*-find_event_revise.*.proportional_split.edit_fragment_plan..jsonl`. Each line in the train/validation files contains one example.
 
 ## Environment Setup
 All experiments are run with a modified version of the codebase from the BenchCLAMP codebase under `semantic_parsing_with_constrained_lm/`. To set up the environement, follow the instructions under `semantic_parsing_with_constrained_lm/README.md`.
