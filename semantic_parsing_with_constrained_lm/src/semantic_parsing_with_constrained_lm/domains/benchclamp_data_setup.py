@@ -125,9 +125,9 @@ class BenchClampDatasetConfig(ClampDataConfig):
             test_data_file = "./data/20230222-find_event_revise.valid.proportional_split.text-davinci-003.8_examples.jsonl"
         
         if self.dataset_name == "CalFlowFindEventReviseEditFragment":
-            train_data_file = "./data/20230222-find_event_revise.train.proportional_split.edit_fragment_plan.resplit.jsonl"
-            dev_data_file = "./data/20230222-find_event_revise.valid.proportional_split.edit_fragment_plan.resplit.jsonl" 
-            test_data_file = "./data/20230222-find_event_revise.valid.proportional_split.edit_fragment_plan.resplit.jsonl" 
+            train_data_file = "./data/20230222-find_event_revise.train.proportional_split.edit_fragment_plan.jsonl"
+            dev_data_file = "./data/20230222-find_event_revise.valid.proportional_split.edit_fragment_plan.jsonl" 
+            test_data_file = "./data/20230222-find_event_revise.valid.proportional_split.edit_fragment_plan.jsonl" 
 
         with BlobFile(str(train_data_file)) as bf:
             print(f"Reading {train_data_file}")
